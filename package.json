@@ -1,17 +1,17 @@
 {
-  "name": "package-name",
+  "name": "vue-rectangle-reveal",
   "version": "0.1.0",
   "description": "",
   "author": "AlbanCrepel <alban.crepel@gmail.com>",
   "license": "MIT",
   "private": false,
-  "main": "dist/file.js",
+  "main": "dist/vue-rectangle-reveal.js",
   "scripts": {
     "build": "webpack --config ./webpack.config.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/AlbanCrepel/repo.git"
+    "url": "https://github.com/AlbanCrepel/vue-rectangle-reveal.git"
   },
   "dependencies": {
     "vue": "^2.5.2"

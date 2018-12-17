@@ -45,11 +45,11 @@ var config = {
 
 module.exports = [
     merge(config, {
-        entry: path.resolve(__dirname + '/src/Component.vue'),
+        entry: path.resolve(__dirname + '/src/VueRectangleReveal.vue'),
         output: {
-            filename: 'package.js',
+            filename: 'vue-rectangle-reveal.js',
             libraryTarget: 'umd',
-            library: 'name',
+            library: 'vue-rectangle-reveal',
             umdNamedDefine: true
         }
     })
