@@ -38,19 +38,28 @@
         data() {
             return {
                 currentAnimation: null,
-                resolve: null
+                resolve: null,
+            }
+        },
+        computed : {
+            rectangle(){
+                return this.$refs.rectangle;
+            },
+            element(){
+                return this.$refs.element;
+            },
+            wrapper(){
+                return this.$refs.wrapper;
             }
         },
         methods: {
             animateOut() {
-                const wrapper = this.$refs.wrapper;
-                wrapper.classList.add("animate-out");
+                this.wrapper.classList.add("animate-out");
                 this.currentAnimation = this.createAnimationPromise();
                 return this.currentAnimation;
             },
             animateIn() {
-                const wrapper = this.$refs.wrapper;
-                wrapper.classList.add("animate-in");
+                this.wrapper.classList.add("animate-in");
                 this.currentAnimation = this.createAnimationPromise();
                 return this.currentAnimation;
             },
@@ -58,34 +67,38 @@
                 return new Promise((resolve, reject) => {
                     this.resolve = resolve;
                 });
+            },
+            setDelay(delay){
+                this.rectangle.style.animationDelay = delay + "s";
+                this.element.style.animationDelay = delay + "s";
+                return this;
+            },
+            setDuration(duration){
+                this.rectangle.style.animationDuration = duration + "s";
+                this.element.style.animationDuration = duration + "s";
+                return this;
             }
         },
         mounted() {
-            const wrapper = this.$refs.wrapper;
-            const rectangle = this.$refs.rectangle;
-            const element = this.$refs.element;
+            this.setDelay(this.delay);
+            this.setDuration(this.duration);
 
-            rectangle.style.animationDelay = this.delay + "s";
-            rectangle.style.backgroundColor = this.color;
-            element.style.animationDelay = this.delay + "s";
+            this.rectangle.style.backgroundColor = this.color;
 
-            rectangle.style.animationDuration = this.duration + "s";
-            element.style.animationDuration = this.duration + "s";
-
-            rectangle.style.animationTimingFunction = this.easing;
+            this.rectangle.style.animationTimingFunction = this.easing;
 
             if(this.autoPlayAnimation){
                 this.animateIn();
             }
 
-            rectangle.addEventListener("animationend", () => {
-                if (wrapper.classList.contains("animate-in")) {
-                    element.style.opacity = 1;
-                } else if (wrapper.classList.contains("animate-out")) {
-                    element.style.opacity = 0;
+            this.rectangle.addEventListener("animationend", () => {
+                if (this.wrapper.classList.contains("animate-in")) {
+                    this.element.style.opacity = 1;
+                } else if (this.wrapper.classList.contains("animate-out")) {
+                    this.element.style.opacity = 0;
                 }
-                wrapper.classList.remove("animate-in");
-                wrapper.classList.remove("animate-out");
+                this.wrapper.classList.remove("animate-in");
+                this.wrapper.classList.remove("animate-out");
 
                 this.resolve();
                 this.$emit("animationEnd");
