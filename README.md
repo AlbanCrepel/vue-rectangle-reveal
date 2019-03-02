@@ -83,9 +83,10 @@ Here is a more complete example if you want to control the behavior of the compo
 |--------------|:------:|------------------------------------------------------------------|----------|---------------|
 |duration        | Number  |The duration of the animation in seconds      |false      |1.2   |
 |delay        |Number   |The delay of the animation in seconds      |false      |0   |
-|easing        |String   |The easing to use for the animation      |false      |"cubic-bezier(1.000, 0.000, 0.000, 1.000)" /* easeInOutExpo*/   |
+|easing        |String   |The easing to use for the animation      |false      |"1.000, 0.000, 0.000, 1.000" /* easeInOutExpo*/   |
 |color        |String   |The color of the rectangle shape, with the css color format      |false      |"black"   |
 |autoPlayAnimation        |Boolean   |Whether the animation is to be played automatically      |false      |true   |
+|direction        |String   |The direction in which the animation is done (can be "right"|"left"|"top"|"bottom")      |false      |"right"   |
 
 ## Methods
 

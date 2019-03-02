@@ -50,7 +50,7 @@ module.exports = [
             filename: 'vue-rectangle-reveal.js',
             libraryTarget: 'umd',
             library: 'vue-rectangle-reveal',
-            umdNamedDefine: true
+            umdNamedDefine: true,
         }
     })
 ];

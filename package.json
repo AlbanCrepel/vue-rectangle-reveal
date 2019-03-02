@@ -14,6 +14,7 @@
     "url": "https://github.com/AlbanCrepel/vue-rectangle-reveal.git"
   },
   "dependencies": {
+    "gsap": "^2.0.2",
     "vue": "^2.5.2"
   },
   "devDependencies": {

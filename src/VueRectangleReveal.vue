@@ -1,22 +1,25 @@
 <template>
     <div class="vue-rectangle-reveal">
-        <div class="element-wrapper" ref="wrapper">
+        <div class="element-wrapper">
             <div class="element" ref="element">
                 <slot></slot>
             </div>
-            <div class="rectangle" ref="rectangle"></div>
+            <div class="rectangle" ref="rectangle" :style="{ backgroundColor : color }"></div>
         </div>
     </div>
 </template>
 
 <script>
 
+    import { TimelineLite } from "gsap/TweenMax";
+    import CustomEase from "./CustomEase";
+
     export default {
         name: "vue-rectangle-reveal",
         props: {
             duration: {
                 type: Number,
-                default: 1.2
+                default: 1.5
             },
             delay: {
                 type: Number,
@@ -24,7 +27,7 @@
             },
             easing: {
                 type: String,
-                default: "cubic-bezier(1.000, 0.000, 0.000, 1.000)" //easeInOutExpo
+                default: "1.000, 0.000, 0.000, 1.000" //easeInOutExpo
             },
             color: {
                 type: String,
@@ -33,82 +36,113 @@
             autoPlayAnimation: {
                 type: Boolean,
                 default: true
+            },
+            direction: {
+                type: String,
+                default: "right"
             }
         },
         data() {
             return {
                 currentAnimation: null,
                 resolve: null,
+                animationDelay: this.delay,
+                animationDuration: this.duration,
+                animationDirection: this.direction,
             }
         },
-        computed : {
-            rectangle(){
+        computed: {
+            rectangle() {
                 return this.$refs.rectangle;
             },
-            element(){
+            element() {
                 return this.$refs.element;
             },
-            wrapper(){
-                return this.$refs.wrapper;
+            scaleToAnimate(){
+                if(["left", "right"].indexOf(this.animationDirection) > -1){
+                    return "scaleX";
+                }
+                return "scaleY";
+            },
+            transformOriginToAnimate(){
+                if(this.animationDirection === "right"){
+                    return ["left","right"]
+                } else if (this.animationDirection === "left"){
+                    return ["right","left"]
+                } else if (this.animationDirection === "top"){
+                    return ["100% 100%","0 0"]
+                } else if (this.animationDirection === "bottom"){
+                    return ["0 0","100% 100%"]
+                }
+            },
+            animation() {
+                const tl = new TimelineLite({
+                    paused: true,
+                    onComplete: this.onAnimationEnd,
+                    onReverseComplete : this.onAnimationEnd
+                });
+
+                CustomEase.create("customEase", this.easing);
+
+                tl.set(this.element, {clearProps: "all"})
+                    .to(this.element, 0, {opacity: 0})
+                    .to(this.rectangle, 0,
+                        {opacity: 1, transformOrigin: this.transformOriginToAnimate[0], [this.scaleToAnimate]: 0})
+                    .to(this.rectangle, this.animationDuration / 2,
+                        {opacity: 1, transformOrigin: this.transformOriginToAnimate[0], [this.scaleToAnimate]: 1, ease: "customEase"})
+                    .to(this.element, 0,
+                        {opacity: 1})
+                    .to(this.rectangle, this.animationDuration / 2,
+                        {transformOrigin: this.transformOriginToAnimate[1], [this.scaleToAnimate]: 0, ease: "customEase"});
+
+                return tl;
             }
         },
         methods: {
+            onAnimationEnd(){
+                this.resolve();
+                this.$emit("animationEnd");
+            },
             animateOut() {
-                this.wrapper.classList.add("animate-out");
+                setTimeout(() => {
+                    this.animation.reverse(0);
+                }, this.animationDelay * 1000);
+
                 this.currentAnimation = this.createAnimationPromise();
                 return this.currentAnimation;
             },
             animateIn() {
-                this.wrapper.classList.add("animate-in");
+                setTimeout(() => {
+                    this.animation.play();
+                }, this.animationDelay * 1000);
+
                 this.currentAnimation = this.createAnimationPromise();
                 return this.currentAnimation;
             },
             createAnimationPromise() {
-                return new Promise((resolve, reject) => {
+                return new Promise((resolve) => {
                     this.resolve = resolve;
                 });
             },
-            setDelay(delay){
-                this.rectangle.style.animationDelay = delay + "s";
-                this.element.style.animationDelay = delay + "s";
+            setDelay(delay) {
+                this.animationDelay = delay;
                 return this;
             },
-            setDuration(duration){
-                this.rectangle.style.animationDuration = duration + "s";
-                this.element.style.animationDuration = duration + "s";
+            setDuration(duration) {
+                this.animationDuration = duration;
                 return this;
             }
         },
         mounted() {
-            this.setDelay(this.delay);
-            this.setDuration(this.duration);
-
-            this.rectangle.style.backgroundColor = this.color;
-
-            this.rectangle.style.animationTimingFunction = this.easing;
-
-            if(this.autoPlayAnimation){
+            if (this.autoPlayAnimation) {
                 this.animateIn();
             }
-
-            this.rectangle.addEventListener("animationend", () => {
-                if (this.wrapper.classList.contains("animate-in")) {
-                    this.element.style.opacity = 1;
-                } else if (this.wrapper.classList.contains("animate-out")) {
-                    this.element.style.opacity = 0;
-                }
-                this.wrapper.classList.remove("animate-in");
-                this.wrapper.classList.remove("animate-out");
-
-                this.resolve();
-                this.$emit("animationEnd");
-            })
         }
     }
 
 </script>
 
-<style scoped>
+<style>
 
     .vue-rectangle-reveal {
         display: flex;
@@ -121,7 +155,7 @@
     .element {
         opacity: 0;
         will-change: opacity;
-        display: flex; /* This is to prevent weird space behavior on images in the slot */
+        display: flex;
         align-items: baseline;
     }
 
@@ -135,65 +169,6 @@
         opacity: 0;
 
         will-change: transform-origin, tranform, opacity;
-    }
-
-    .animate-in .rectangle {
-        animation-name: reveal;
-    }
-
-    .animate-in .element {
-        animation-name: appear;
-        opacity: 0;
-    }
-
-    .animate-out .rectangle {
-        animation-direction: reverse;
-        animation-name: reveal;
-
-    }
-
-    .animate-out .element {
-        animation-direction: reverse;
-        animation-name: appear;
-        opacity: 1;
-    }
-
-    @keyframes appear {
-        0% {
-            opacity: 0;
-        }
-        50% {
-            opacity: 0;
-        }
-        51% {
-            opacity: 1;
-        }
-        100% {
-            opacity: 1;
-        }
-    }
-
-    @keyframes reveal {
-        0% {
-            opacity: 1;
-            transform-origin: left;
-            transform: scaleX(0);
-        }
-        50% {
-            opacity: 1;
-            transform-origin: left;
-            transform: scaleX(1);
-        }
-        51% {
-            opacity: 1;
-            transform-origin: right;
-            transform: scaleX(1);
-        }
-        100% {
-            opacity: 1;
-            transform-origin: right;
-            transform: scaleX(0);
-        }
     }
 
 </style>
