@@ -86,7 +86,7 @@ Here is a more complete example if you want to control the behavior of the compo
 |easing        |String   |The easing to use for the animation      |false      |"1.000, 0.000, 0.000, 1.000" /* easeInOutExpo*/   |
 |color        |String   |The color of the rectangle shape, with the css color format      |false      |"black"   |
 |autoPlayAnimation        |Boolean   |Whether the animation is to be played automatically      |false      |true   |
-|direction        |String   |The direction in which the animation is done (can be "right"|"left"|"top"|"bottom")      |false      |"right"   |
+|direction        |String   |The direction in which the animation is done (can be "right","left","top","bottom")      |false      |"right"   |
 
 ## Methods
 
